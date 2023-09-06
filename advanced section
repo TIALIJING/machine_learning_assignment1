@@ -1,0 +1,43 @@
+library(foreign)
+setwd("/Users/lijing/Lund University/classes/Machine Learning/Assignment1")
+Guns <- read.dta("Guns.dta")
+
+get_beta <- function(X, y){
+ mean_x <- mean(X) 
+ mean_y <- mean(y)
+ 
+ diff_x <- X - mean_x
+ diff_y <- y - mean_y
+ 
+ betahat <- mean(sum(X*y - mean_x*mean_y)/mean(sum(X^2 - mean_x^2)))
+ return(betahat)
+ 
+}
+
+res <- function(X, y){
+  betahat0 <- mean(y) - mean(X) * get_beta(X,y)
+  residuals <- sum((y - betahat0 - get_beta(X,y)*X)^2)
+  return(residuals)
+}
+
+
+r_square <- function(X,y){
+  sse <- res(X,y)
+  sst <- sum((y - mean(y))^2)
+  result <- 1 - sse/sst 
+  return(result)
+}
+
+Guns$shall <-  as.numeric(Guns$shall)
+X_2d <- data.frame(
+  logarithm_of_state_population = log(Guns$pop),
+  per_capital_income = Guns$avginc,
+  shall_carry_law = Guns$shall,
+  log_murder_rates = Guns$mur,
+  log_robbery_rates = Guns$rob
+)
+
+y_2d <- c(Guns$vio)
+
+R2_withstate_2e   <- r_square(X_2d, y_2d)
+print(R2_withstate_2e)
